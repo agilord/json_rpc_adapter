@@ -1,6 +1,7 @@
 name: json_rpc_adapter
 description: HTTP client and shelf server adapters for easier JSON-RPC (optional mirrors for automatic binding).
 version: 0.4.0
+repository: https://github.com/agilord/json_rpc_adapter
 
 environment:
   sdk: '>=2.7.0 <3.0.0'
