@@ -50,7 +50,7 @@ class JsonRpcHttpClient {
     final map = json.decode(body) as Map<String, dynamic>;
     if (map['error'] != null) {
       final value = map['error'];
-      dynamic error = _rpcExceptionDecoder?.tryDecode(value);
+      var error = _rpcExceptionDecoder?.tryDecode(value);
       if (_errorDecoder != null) {
         error ??= _errorDecoder(value);
       }

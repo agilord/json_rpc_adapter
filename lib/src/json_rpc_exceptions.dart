@@ -58,7 +58,7 @@ class RpcExceptionDecoder {
     _decoders[code] = fn;
   }
 
-  RpcException tryDecode(dynamic error) {
+  dynamic tryDecode(dynamic error) {
     if (error is Map && error.containsKey('code')) {
       final code = error['code'];
       final message = error['message'];
