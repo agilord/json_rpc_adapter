@@ -50,7 +50,7 @@ class RpcExceptionDecoder {
     SERVER_ERROR: (c, m, d) => ServerException(m, data: d),
   };
 
-  RpcExceptionDecoder([Map<int, RpcExceptionDecoderFn> decoders]) {
+  RpcExceptionDecoder([Map<int, RpcExceptionDecoderFn>? decoders]) {
     decoders?.forEach(registerDecoder);
   }
 

@@ -12,7 +12,7 @@ abstract class ReflectedApiClient<T> {
   final JsonRpcHttpClient _client;
   final _methods = <Symbol, Method>{};
 
-  ReflectedApiClient(this._client, [List<Type> types]) {
+  ReflectedApiClient(this._client, [List<Type>? types]) {
     _registerType(T);
     types?.forEach(_registerType);
   }
@@ -51,7 +51,7 @@ abstract class ReflectedApiClient<T> {
         .then(
       (v) {
         if (m.outputIsJsonNative) return v;
-        return m.outputClass.newInstance(Symbol('fromJson'), [v]).reflectee;
+        return m.outputClass!.newInstance(Symbol('fromJson'), [v]).reflectee;
       },
     ).then(
       (r) {

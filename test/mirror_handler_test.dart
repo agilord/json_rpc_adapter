@@ -30,7 +30,7 @@ void main() {
           ),
         ),
       );
-      expect(json.decode(await rs.readAsString()), {
+      expect(json.decode(await rs!.readAsString()), {
         'result': {'value': 8}
       });
     });
@@ -48,7 +48,7 @@ void main() {
           ),
         ),
       );
-      expect(json.decode(await rs.readAsString()), {
+      expect(json.decode(await rs!.readAsString()), {
         'result': '7',
       });
     });
@@ -66,7 +66,7 @@ void main() {
           ),
         ),
       );
-      expect(json.decode(await rs.readAsString()), {
+      expect(json.decode(await rs!.readAsString()), {
         'result': null,
       });
     });
@@ -84,7 +84,7 @@ void main() {
           ),
         ),
       );
-      expect(json.decode(await rs.readAsString()), {
+      expect(json.decode(await rs!.readAsString()), {
         'result': null,
       });
     });
@@ -102,7 +102,7 @@ void main() {
           ),
         ),
       );
-      expect(json.decode(await rs.readAsString()), {
+      expect(json.decode(await rs!.readAsString()), {
         'result': 5,
       });
     });

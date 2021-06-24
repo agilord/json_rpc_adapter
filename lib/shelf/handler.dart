@@ -13,8 +13,8 @@ class JsonRpcShelfHandler {
   final bool _omitRpcVersion;
 
   JsonRpcShelfHandler({
-    Map<String, RpcMethod> methods,
-    bool omitRpcVersion,
+    Map<String, RpcMethod>? methods,
+    bool? omitRpcVersion,
   }) : _omitRpcVersion = omitRpcVersion ?? false {
     if (methods != null) _methods.addAll(methods);
   }
@@ -26,10 +26,10 @@ class JsonRpcShelfHandler {
     _methods[method] = fn;
   }
 
-  Future<Response> handler(Request request) async {
+  Future<Response?> handler(Request request) async {
     final body = await request.readAsString();
     final rq = json.decode(body) as Map<String, dynamic>;
-    final method = rq['method'] as String;
+    final method = rq['method'] as String?;
     final params = rq['params'];
     final id = rq['id'];
     if (!_methods.containsKey(method)) {
@@ -37,7 +37,7 @@ class JsonRpcShelfHandler {
     }
 
     try {
-      final rs = await _methods[method](params);
+      final rs = await _methods[method!]!(params);
       return Response(
         200,
         body: json.encode({

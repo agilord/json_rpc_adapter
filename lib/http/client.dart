@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:http/http.dart';
-import 'package:meta/meta.dart';
 
 import '../json_rpc_adapter.dart';
 export '../json_rpc_adapter.dart';
@@ -12,7 +11,7 @@ typedef ErrorDecoder = dynamic Function(dynamic error);
 class JsonRpcHttpClient {
   final Client _client;
   final Uri _endpoint;
-  final ErrorDecoder _errorDecoder;
+  final ErrorDecoder? _errorDecoder;
   final RpcExceptionDecoder _rpcExceptionDecoder;
 
   final bool _omitRequestId;
@@ -20,12 +19,12 @@ class JsonRpcHttpClient {
   int _id = 0;
 
   JsonRpcHttpClient({
-    Client client,
-    @required /* String | Uri */ endpoint,
-    ErrorDecoder errorDecoder,
-    RpcExceptionDecoder rpcExceptionDecoder,
-    bool omitRequestId,
-    bool omitRpcVersion,
+    Client? client,
+    required /* String | Uri */ endpoint,
+    ErrorDecoder? errorDecoder,
+    RpcExceptionDecoder? rpcExceptionDecoder,
+    bool? omitRequestId,
+    bool? omitRpcVersion,
   })  : _client = client ?? Client(),
         _endpoint = endpoint is Uri ? endpoint : Uri.parse(endpoint.toString()),
         _errorDecoder = errorDecoder,
@@ -50,12 +49,12 @@ class JsonRpcHttpClient {
     final map = json.decode(body) as Map<String, dynamic>;
     if (map['error'] != null) {
       final value = map['error'];
-      var error = _rpcExceptionDecoder?.tryDecode(value);
+      var error = _rpcExceptionDecoder.tryDecode(value);
       if (_errorDecoder != null) {
-        error ??= _errorDecoder(value);
+        error ??= _errorDecoder!(value);
       }
       error ??= InternalException('Not recognized error: $error');
-      throw error;
+      throw error as Exception;
     } else {
       return map['result'];
     }

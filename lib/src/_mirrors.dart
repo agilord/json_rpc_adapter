@@ -1,22 +1,20 @@
 import 'dart:mirrors';
 
-import 'package:meta/meta.dart';
-
 class Method {
   final String name;
-  final ClassMirror inputClass;
+  final ClassMirror? inputClass;
   final bool inputIsJsonNative;
   final TypeMirror outputType;
-  final ClassMirror outputClass;
+  final ClassMirror? outputClass;
   final bool outputIsJsonNative;
 
   Method({
-    @required this.name,
-    @required this.inputClass,
-    @required this.inputIsJsonNative,
-    @required this.outputType,
-    @required this.outputClass,
-    @required this.outputIsJsonNative,
+    required this.name,
+    required this.inputClass,
+    required this.inputIsJsonNative,
+    required this.outputType,
+    required this.outputClass,
+    required this.outputIsJsonNative,
   });
 }
 
@@ -32,7 +30,7 @@ List<Method> reflectMethods(Type t) {
       if (method.parameters.length > 1) continue;
       if (method.qualifiedName.toString().contains('dart.core')) continue;
 
-      ClassMirror inputClass;
+      ClassMirror? inputClass;
       var inputIsJsonNative = true;
       if (method.parameters.length == 1) {
         inputClass = reflectClass(method.parameters.single.type.reflectedType);

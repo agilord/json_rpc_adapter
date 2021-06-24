@@ -19,7 +19,7 @@ void main() {
     final mockClient = MockClient((rq) async {
       final rs = await handler.handler(shelf.Request(rq.method, rq.url,
           body: rq.bodyBytes, headers: rq.headers));
-      return Response(await rs.readAsString(), rs.statusCode,
+      return Response(await rs!.readAsString(), rs.statusCode,
           headers: rs.headers);
     });
     final client = JsonRpcHttpClient(
