@@ -1,10 +1,9 @@
 import 'dart:convert';
 
-import 'package:shelf/shelf.dart';
-import 'package:test/test.dart';
-
 import 'package:json_rpc_adapter/shelf/handler.dart';
 import 'package:json_rpc_adapter/shelf/mirror_handler.dart';
+import 'package:shelf/shelf.dart';
+import 'package:test/test.dart';
 
 import 'shared_api.dart';
 
