@@ -1,6 +1,5 @@
 import 'package:http/http.dart';
 import 'package:http/testing.dart';
-import 'package:json_rpc_adapter/http/client.dart';
 import 'package:json_rpc_adapter/http/mirror_client.dart';
 import 'package:json_rpc_adapter/shelf/handler.dart';
 import 'package:json_rpc_adapter/shelf/mirror_handler.dart';

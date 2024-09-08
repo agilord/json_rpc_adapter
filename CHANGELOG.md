@@ -1,3 +1,7 @@
+## 0.6.0
+
+- Updated dependencies.
+
 ## 0.5.0
 
 - Migrated to null safety.
