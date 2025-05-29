@@ -11,11 +11,14 @@ typedef RpcMethod = Future Function(dynamic rq);
 class JsonRpcShelfHandler {
   final _methods = <String, RpcMethod>{};
   final bool _omitRpcVersion;
+  final Codec<Object?, List<int>> _jsonUtf8;
 
   JsonRpcShelfHandler({
     Map<String, RpcMethod>? methods,
+    JsonCodec? jsonCodec,
     bool? omitRpcVersion,
-  }) : _omitRpcVersion = omitRpcVersion ?? false {
+  }) : _jsonUtf8 = (jsonCodec ?? json).fuse(utf8),
+       _omitRpcVersion = omitRpcVersion ?? false {
     if (methods != null) _methods.addAll(methods);
   }
 
@@ -27,8 +30,10 @@ class JsonRpcShelfHandler {
   }
 
   Future<Response?> handler(Request request) async {
-    final body = await request.readAsString();
-    final rq = json.decode(body) as Map<String, dynamic>;
+    final rq = await _jsonUtf8.decoder.bind(request.read()).single;
+    if (rq is! Map<String, dynamic>) {
+      return null;
+    }
     final method = rq['method'] as String?;
     final params = rq['params'];
     final id = rq['id'];
@@ -40,14 +45,12 @@ class JsonRpcShelfHandler {
       final rs = await _methods[method!]!(params);
       return Response(
         200,
-        body: json.encode({
+        body: _jsonUtf8.encode({
           if (!_omitRpcVersion) 'jsonrpc': '2.0',
           if (id != null) 'id': id,
           'result': rs,
         }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
       );
     } catch (e, _) {
       final ex = e is RpcException ? e : ServerException(e.toString());
@@ -59,14 +62,12 @@ class JsonRpcShelfHandler {
 
       return Response(
         400,
-        body: json.encode({
+        body: _jsonUtf8.encode({
           if (!_omitRpcVersion) 'jsonrpc': '2.0',
           if (id != null) 'id': id,
           'error': error,
         }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
       );
     }
   }

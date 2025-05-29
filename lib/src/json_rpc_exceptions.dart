@@ -18,12 +18,12 @@ class MethodNotFoundException extends RpcException {
   MethodNotFoundException(String message) : super(METHOD_NOT_FOUND, message);
 
   MethodNotFoundException.withMethodName(String methodName)
-      : super.methodNotFound('Method `$methodName` not found.');
+    : super.methodNotFound('Method `$methodName` not found.');
 }
 
 /// Exception thrown when the parameters are invalid.
 class InvalidParamsException extends RpcException {
-  InvalidParamsException(String message) : super.invalidParams(message);
+  InvalidParamsException(super.message) : super.invalidParams();
 }
 
 /// Exception thrown when there was an unhandled internal exception.
@@ -34,11 +34,11 @@ class InternalException extends RpcException {
 /// Exception thrown when there was a server error.
 class ServerException extends RpcException {
   ServerException(String message, {data})
-      : super(SERVER_ERROR, message, data: data);
+    : super(SERVER_ERROR, message, data: data);
 }
 
-typedef RpcExceptionDecoderFn = RpcException Function(
-    int code, String message, dynamic data);
+typedef RpcExceptionDecoderFn =
+    RpcException Function(int code, String message, dynamic data);
 
 class RpcExceptionDecoder {
   final _decoders = <int, RpcExceptionDecoderFn>{

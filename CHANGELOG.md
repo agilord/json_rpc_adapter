@@ -1,3 +1,10 @@
+## 0.7.0
+
+- Updated dependencies.
+- Support additional HTTP client headers (for authorization).
+- Support custom `JsonCodec`.
+- Throwing `UnimplementedError` when nullable return type returns `null` (previously it was stuck).
+
 ## 0.6.0
 
 - Updated dependencies.

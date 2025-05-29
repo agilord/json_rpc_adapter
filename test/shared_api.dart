@@ -3,6 +3,8 @@ abstract class TestApi {
   Future<String> incrementInt(int x);
 
   Future<void> setter(int x);
+
+  /// Note: `int?` is not supported here yet, only non-null `int`.
   Future<int?> getter();
 }
 

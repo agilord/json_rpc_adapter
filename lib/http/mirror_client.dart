@@ -37,30 +37,38 @@ abstract class ReflectedApiClient<T> {
     if (m == null) {
       throw NoSuchMethodError.withInvocation(this, invocation);
     }
-    final c = m.outputType.qualifiedName.toString() == 'Symbol("void")'
+    final isReturningVoid =
+        m.outputType.qualifiedName.toString() == 'Symbol("void")';
+    final c = isReturningVoid
         ? reflect(Completer<void>())
         : (reflectType(Completer, [m.outputType.reflectedType]) as ClassMirror)
-            .newInstance(Symbol(''), []);
+              .newInstance(Symbol(''), []);
 
     _client
         .invoke(
-            m.name,
-            invocation.positionalArguments.isEmpty
-                ? null
-                : invocation.positionalArguments.single)
+          m.name,
+          invocation.positionalArguments.isEmpty
+              ? null
+              : invocation.positionalArguments.single,
+        )
+        .then((v) {
+          if (m.outputIsJsonNative) return v;
+          return m.outputClass!.newInstance(Symbol('fromJson'), [v]).reflectee;
+        })
         .then(
-      (v) {
-        if (m.outputIsJsonNative) return v;
-        return m.outputClass!.newInstance(Symbol('fromJson'), [v]).reflectee;
-      },
-    ).then(
-      (r) {
-        c.invoke(Symbol('complete'), [r]);
-      },
-      onError: (e, st) {
-        c.invoke(Symbol('completeError'), [e, st]);
-      },
-    );
+          (r) {
+            if (r == null && !isReturningVoid) {
+              c.invoke(Symbol('completeError'), [
+                UnimplementedError('`null` not supported yet'),
+              ]);
+            } else {
+              c.invoke(Symbol('complete'), [r]);
+            }
+          },
+          onError: (e, st) {
+            c.invoke(Symbol('completeError'), [e, st]);
+          },
+        );
 
     return c.getField(Symbol('future')).reflectee;
   }

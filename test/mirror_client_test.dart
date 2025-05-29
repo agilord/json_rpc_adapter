@@ -11,14 +11,22 @@ import 'shared_api.dart';
 void main() {
   group('mirror API client test', () {
     final api = TestApiImpl();
-    final handler = JsonRpcShelfHandler(
-      omitRpcVersion: true,
-    )..registerApi<TestApi>(api);
+    final handler = JsonRpcShelfHandler(omitRpcVersion: true)
+      ..registerApi<TestApi>(api);
     final mockClient = MockClient((rq) async {
-      final rs = await handler.handler(shelf.Request(rq.method, rq.url,
-          body: rq.bodyBytes, headers: rq.headers));
-      return Response(await rs!.readAsString(), rs.statusCode,
-          headers: rs.headers);
+      final rs = await handler.handler(
+        shelf.Request(
+          rq.method,
+          rq.url,
+          body: rq.bodyBytes,
+          headers: rq.headers,
+        ),
+      );
+      return Response(
+        await rs!.readAsString(),
+        rs.statusCode,
+        headers: rs.headers,
+      );
     });
     final client = JsonRpcHttpClient(
       client: mockClient,
@@ -38,8 +46,10 @@ void main() {
     });
 
     test('getter returning null', () async {
-      final rs = await reflectedApi.getter();
-      expect(rs, null);
+      await expectLater(
+        reflectedApi.getter,
+        throwsA(isA<UnimplementedError>()),
+      );
     });
 
     test('setter', () async {
@@ -54,5 +64,5 @@ void main() {
 }
 
 class TestApiClient extends ReflectedApiClient<TestApi> implements TestApi {
-  TestApiClient(JsonRpcHttpClient client) : super(client);
+  TestApiClient(super.client);
 }

@@ -41,18 +41,22 @@ List<Method> reflectMethods(Type t) {
 
       final outputType = method.returnType.typeArguments.single;
       final outputClass = outputType is ClassMirror ? outputType : null;
-      final outputIsJsonNative = outputClass == null ||
+      final outputIsJsonNative =
+          outputClass == null ||
           !outputClass.declarations.values.whereType<MethodMirror>().any(
-              (m) => m.isRegularMethod && m.simpleName == Symbol('toJson'));
+            (m) => m.isRegularMethod && m.simpleName == Symbol('toJson'),
+          );
       final methodName = method.simpleName.toString().split('"')[1];
-      results.add(Method(
-        name: methodName,
-        inputClass: inputClass,
-        inputIsJsonNative: inputIsJsonNative,
-        outputType: outputType,
-        outputClass: outputClass,
-        outputIsJsonNative: outputIsJsonNative,
-      ));
+      results.add(
+        Method(
+          name: methodName,
+          inputClass: inputClass,
+          inputIsJsonNative: inputIsJsonNative,
+          outputType: outputType,
+          outputClass: outputClass,
+          outputIsJsonNative: outputIsJsonNative,
+        ),
+      );
     }
     for (final si in clazz.superinterfaces) {
       addAll(si);

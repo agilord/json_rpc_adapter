@@ -1,5 +1,3 @@
-# HTTP client and shelf server adapters for easier JSON-RPC
-
 ## Automatic RPC bindings using mirrors
 
 Takes an abstract class API definition with at most one argument on each method:

@@ -13,12 +13,14 @@ extension JsonRpcShelfHandlerMirror on JsonRpcShelfHandler {
       registerMethod(method.name, (js) async {
         final param = method.inputIsJsonNative
             ? js
-            : method.inputClass!
-                .newInstance(Symbol('fromJson'), [js]).reflectee;
-        final rsf = instanz.invoke(
-          Symbol(method.name),
-          [if (method.inputClass != null) param],
-        ).reflectee as Future?;
+            : method.inputClass!.newInstance(Symbol('fromJson'), [
+                js,
+              ]).reflectee;
+        final rsf =
+            instanz.invoke(Symbol(method.name), [
+                  if (method.inputClass != null) param,
+                ]).reflectee
+                as Future?;
         final rs = await rsf;
         if (method.outputIsJsonNative) {
           return rs;

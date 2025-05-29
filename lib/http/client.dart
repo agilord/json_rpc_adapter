@@ -13,7 +13,8 @@ class JsonRpcHttpClient {
   final Uri _endpoint;
   final ErrorDecoder? _errorDecoder;
   final RpcExceptionDecoder _rpcExceptionDecoder;
-
+  final Map<String, String>? _headers;
+  final Codec<Object?, List<int>> _jsonUtf8;
   final bool _omitRequestId;
   final bool _omitRpcVersion;
   int _id = 0;
@@ -21,16 +22,20 @@ class JsonRpcHttpClient {
   JsonRpcHttpClient({
     Client? client,
     required /* String | Uri */ endpoint,
+    JsonCodec? jsonCodec,
     ErrorDecoder? errorDecoder,
     RpcExceptionDecoder? rpcExceptionDecoder,
+    Map<String, String>? headers,
     bool? omitRequestId,
     bool? omitRpcVersion,
-  })  : _client = client ?? Client(),
-        _endpoint = endpoint is Uri ? endpoint : Uri.parse(endpoint.toString()),
-        _errorDecoder = errorDecoder,
-        _rpcExceptionDecoder = rpcExceptionDecoder ?? RpcExceptionDecoder(),
-        _omitRequestId = omitRequestId ?? false,
-        _omitRpcVersion = omitRpcVersion ?? false;
+  }) : _client = client ?? Client(),
+       _endpoint = endpoint is Uri ? endpoint : Uri.parse(endpoint.toString()),
+       _errorDecoder = errorDecoder,
+       _rpcExceptionDecoder = rpcExceptionDecoder ?? RpcExceptionDecoder(),
+       _headers = headers,
+       _jsonUtf8 = (jsonCodec ?? json).fuse(utf8),
+       _omitRequestId = omitRequestId ?? false,
+       _omitRpcVersion = omitRpcVersion ?? false;
 
   Future invoke(String method, dynamic params) async {
     final rq = {
@@ -40,18 +45,22 @@ class JsonRpcHttpClient {
       if (!_omitRequestId) 'id': '${_id++}',
     };
 
-    final rs = await _client.send(
-      Request('POST', _endpoint)
-        ..body = json.encode(rq)
-        ..headers['Content-Type'] = 'application/json',
-    );
-    final body = await rs.stream.bytesToString();
-    final map = json.decode(body) as Map<String, dynamic>;
+    final request = Request('POST', _endpoint)
+      ..bodyBytes = _jsonUtf8.encode(rq)
+      ..headers['Content-Type'] = 'application/json';
+    if (_headers != null) {
+      request.headers.addAll(_headers);
+    }
+    final rs = await _client.send(request);
+    final map = await _jsonUtf8.decoder.bind(rs.stream).single;
+    if (map is! Map<String, dynamic>) {
+      throw FormatException('Unknown response format: $map');
+    }
     if (map['error'] != null) {
       final value = map['error'];
       var error = _rpcExceptionDecoder.tryDecode(value);
       if (_errorDecoder != null) {
-        error ??= _errorDecoder!(value);
+        error ??= _errorDecoder(value);
       }
       error ??= InternalException('Not recognized error: $error');
       throw error as Exception;
